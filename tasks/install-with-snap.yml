@@ -4,12 +4,14 @@
     name: snapd
     state: present
   register: snapd_install
+  become: true
 
 - name: Ensure snapd is enabled.
   systemd:
     name: snapd.socket
     enabled: true
     state: started
+  become: true
 
 - name: Enable classic snap support.
   file:
@@ -17,17 +19,22 @@
     dest: /snap
     state: link
   when: ansible_os_family != "Debian"
+  become: true
 
 - name: Update snap after install.
   shell: snap install core; snap refresh core
   changed_when: true
   failed_when: false
   when: snapd_install is changed
+  become: true
 
 - name: Install certbot via snap.
   snap:
-    name: certbot
+    name: 
+      - certbot
+      - certbot-dns-route53
     classic: true
+  become: true
 
 - name: Symlink certbot into place.
   file:
@@ -35,7 +42,9 @@
     dest: /usr/bin/certbot
     state: link
   ignore_errors: "{{ ansible_check_mode }}"
+  become: true
 
 - name: Set Certbot script variable.
   set_fact:
     certbot_script: /usr/bin/certbot
+  become: true

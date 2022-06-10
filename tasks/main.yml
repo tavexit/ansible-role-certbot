@@ -13,6 +13,17 @@
 - import_tasks: install-from-source.yml
   when: certbot_install_method == 'source'
 
+- import_tasks: create-aws-credentials.yml
+  when: certbot_create_method == 'dns-route53'
+
+- include_tasks: create-cert-route53.yml
+  with_items: "{{ certbot_certs }}"
+  when:
+    - certbot_create_if_missing
+    - certbot_create_method == 'dns-route53'
+  loop_control:
+    loop_var: cert_item
+
 - include_tasks: create-cert-standalone.yml
   with_items: "{{ certbot_certs }}"
   when:

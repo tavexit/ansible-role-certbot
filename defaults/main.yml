@@ -8,12 +8,18 @@ certbot_auto_renew_options: "--quiet --no-self-upgrade"
 
 certbot_testmode: false
 certbot_hsts: false
-
+#certbot_plugins: 
+#  - dns-route53
 
 # Parameters used when creating new Certbot certs.
 certbot_create_if_missing: false
 certbot_create_method: standalone
 certbot_admin_email: email@example.com
+certbot_aws_key_id: asdadasEXAMPLE
+certbot_aws_secret_key: "{{ vault.aws.iam.certbot_aws_key_id }}"
+certbot_aws_region: eu-north-1
+
+#certbot_deploy_hook: "/usr/bin/systemctl reload nginx"
 
 # Default webroot, overwritten by individual per-cert webroot directories
 certbot_webroot: /var/www/letsencrypt
@@ -37,14 +43,17 @@ certbot_create_command: >-
   {{ cert_item.webroot | default(certbot_webroot) if certbot_create_method == 'webroot' else '' }}
   -d {{ cert_item.domains | join(',') }}
   {{ '--pre-hook /etc/letsencrypt/renewal-hooks/pre/stop_services'
-    if certbot_create_standalone_stop_services
+    if certbot_create_standalone_stop_services is defined
   else '' }}
   {{ '--post-hook /etc/letsencrypt/renewal-hooks/post/start_services'
-    if certbot_create_standalone_stop_services
+    if certbot_create_standalone_stop_services is defined
+  else '' }}
+  {{ ('--deploy-hook ' + certbot_deploy_hook)
+    if certbot_deploy_hook
   else '' }}
 
-certbot_create_standalone_stop_services:
-  - nginx
+#certbot_create_standalone_stop_services:
+#  - nginx
   # - apache
   # - varnish
 
