@@ -3,6 +3,7 @@
   stat:
     path: /etc/letsencrypt/live/{{ cert_item.domains | first }}/cert.pem
   register: letsencrypt_cert
+  become: true
 
 - name: Generate new certificate if one doesn't exist.
   command: "{{ certbot_create_command }}"
