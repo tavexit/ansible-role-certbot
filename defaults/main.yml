@@ -36,7 +36,7 @@ certbot_certs: []
 certbot_create_command: >-
   {{ certbot_script }} certonly --{{ certbot_create_method  }}
   {{ '--hsts' if certbot_hsts else '' }}
-  {{ '--test-cert' if (certbot_testmode is defined or cert_item.certbot_testmode is defined) else '' }}
+  {{ '--test-cert' if (certbot_testmode or cert_item.certbot_testmode is defined) else '' }}
   --noninteractive --agree-tos
   --email {{ cert_item.email | default(certbot_admin_email) }}
   {{ '--webroot-path ' if certbot_create_method == 'webroot'  else '' }}
