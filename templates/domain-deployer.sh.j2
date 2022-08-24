@@ -1,0 +1,13 @@
+#!/bin/sh
+domain=$(/usr/bin/basename $RENEWED_LINEAGE)
+if [ "$domain" = {{ cert_item.domains | first }} ]; then
+{{- ('    if [ ! -d /etc/ssl/private/$domain ]; then
+        /usr/bin/mkdir -p /etc/ssl/private/$domain;
+        /usr/bin/chmod -R 700 /etc/ssl/private/$domain;
+    fi
+    /usr/bin/cat "$RENEWED_LINEAGE/privkey.pem" "$RENEWED_LINEAGE/fullchain.pem" > /etc/ssl/private/$domain/combined.pem
+    /usr/bin/chmod 400 /etc/ssl/private/$domain/combined.pem;')
+    if (certbot_combine_cert is defined or cert_item.certbot_combine_cert is defined)
+  else '' }}
+    {{ certbot_deploy_hook }}
+fi

@@ -5,6 +5,16 @@
   register: letsencrypt_cert
   become: true
 
+- name: Create deploy scripts for the certificate
+  template: 
+    src: domain-deployer.sh.j2 
+    dest: "/etc/letsencrypt/renewal-hooks/{{ cert_item.domains | first }}-deployer.sh"
+    mode: 0500
+    owner: root
+    group: root
+  become: true
+  when: certbot_deploy_hook and (certbot_combine_cert is defined or cert_item.certbot_combine_cert is defined)
+
 - name: Generate new certificate if one doesn't exist.
   command: "{{ certbot_create_command }}"
   when: not letsencrypt_cert.stat.exists

@@ -36,7 +36,7 @@ certbot_certs: []
 certbot_create_command: >-
   {{ certbot_script }} certonly --{{ certbot_create_method  }}
   {{ '--hsts' if certbot_hsts else '' }}
-  {{ '--test-cert' if certbot_testmode else '' }}
+  {{ '--test-cert' if certbot_testmode or cert_item.certbot_testmode else '' }}
   --noninteractive --agree-tos
   --email {{ cert_item.email | default(certbot_admin_email) }}
   {{ '--webroot-path ' if certbot_create_method == 'webroot'  else '' }}
@@ -48,9 +48,13 @@ certbot_create_command: >-
   {{ '--post-hook /etc/letsencrypt/renewal-hooks/post/start_services'
     if certbot_create_standalone_stop_services is defined
   else '' }}
-  {{ ('--deploy-hook ' + certbot_deploy_hook)
-    if certbot_deploy_hook
+  {{ ('--deploy-hook ' + '"' + certbot_deploy_hook + '"')
+    if certbot_deploy_hook and (certbot_combine_cert is not defined or cert_item.certbot_combine_cert is not defined)
   else '' }}
+  {{ ('--deploy-hook /etc/letsencrypt/renewal-hooks/' + cert_item.domains | first + '-deployer.sh')
+    if certbot_deploy_hook and (certbot_combine_cert is defined or cert_item.certbot_combine_cert is defined)
+  else '' }}
+
 
 #certbot_create_standalone_stop_services:
 #  - nginx
@@ -67,3 +71,6 @@ certbot_keep_updated: true
 
 # Where to put Certbot when installing from source.
 certbot_dir: /opt/certbot
+
+# To combine certificates after successful renewal set this to true
+# certbot_combine_cert: true
