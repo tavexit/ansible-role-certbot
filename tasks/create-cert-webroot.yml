@@ -4,6 +4,17 @@
     path: /etc/letsencrypt/live/{{ cert_item.domains | first }}/cert.pem
   register: letsencrypt_cert
 
+- name: Ensure pre and post hook folders exist.
+  file:
+    path: /etc/letsencrypt/renewal-hooks/{{ item }}
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - deploy
+  when: certbot_deploy_hook and (certbot_combine_cert is defined or cert_item.certbot_combine_cert is defined)
+
 - name: Create deploy scripts for the certificate
   template: 
     src: domain-deployer.sh.j2 
