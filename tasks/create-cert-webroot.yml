@@ -7,7 +7,7 @@
 - name: Create deploy scripts for the certificate
   template: 
     src: domain-deployer.sh.j2 
-    dest: "/etc/letsencrypt/renewal-hooks/{{ cert_item.domains | first }}-deployer.sh"
+    dest: "/etc/letsencrypt/renewal-hooks/deploy/{{ cert_item.domains | first }}-deployer.sh"
     mode: 0500
     owner: root
     group: root

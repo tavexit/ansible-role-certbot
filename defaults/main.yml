@@ -51,7 +51,7 @@ certbot_create_command: >-
   {{ ('--deploy-hook ' + '"' + certbot_deploy_hook + '"')
     if certbot_deploy_hook and (certbot_combine_cert is not defined or cert_item.certbot_combine_cert is not defined)
   else '' }}
-  {{ ('--deploy-hook /etc/letsencrypt/renewal-hooks/' + cert_item.domains | first + '-deployer.sh')
+  {{ ('--deploy-hook /etc/letsencrypt/renewal-hooks/deploy/' + cert_item.domains | first + '-deployer.sh')
     if certbot_deploy_hook and (certbot_combine_cert is defined or cert_item.certbot_combine_cert is defined)
   else '' }}
 
